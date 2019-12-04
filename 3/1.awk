@@ -11,13 +11,22 @@ function setWireGrid(gx, gy, val) {
     grid[gx","gy] = val;
 }
 
+function getTraversedGrid(w, gx, gy) {
+    return traverseGrid[w","gx","gy];
+}
+
+function setTraversedGrid(w, gx, gy, t) {
+    traverseGrid[w","gx","gy] = t;
+}
+
 # thanks mse
 function abs(v) { return (v<0)?-v:v }
 
 {
     x = 0;
     y = 0;
-    setWireGrid(x, y, "")
+    setWireGrid(x, y, "");
+    travelled = 0;
     # for each line of wires, we'll split the line into its component paths
     # split() is the awk function to divide a string into pieces
     pathCount = split($0, paths, ",")
@@ -30,10 +39,11 @@ function abs(v) { return (v<0)?-v:v }
 
         # now step in the direction marking the grid
         for(j = 0; j<stepAmount; j++) {
-            currentGridValue = getWireGrid(x, y)
             if (getWireGrid(x, y) != "" && getWireGrid(x, y) < NR) {
                 # This is an intersection
-                distance = abs(x) + abs(y);
+                # Grab the other wire's distance for this spot
+                otherDistance = getTraversedGrid(NR-1, x, y)
+                distance = travelled + otherDistance;
                 if (distance < shortestIntersection) {
                     shortestIntersection = distance;
                 }
@@ -43,6 +53,9 @@ function abs(v) { return (v<0)?-v:v }
             if (direction == "L") { x-=1; }
             if (direction == "U") { y-=1; }
             if (direction == "D") { y+=1; }
+
+            travelled += 1;
+            setTraversedGrid(NR, x, y, travelled);
         }
     }
 }
