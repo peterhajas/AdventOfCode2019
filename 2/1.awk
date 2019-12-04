@@ -32,8 +32,9 @@ function printData() {
 }
 
 END{
-    data[1] = 12;
-    data[2] = 2;
+    # I found these with some simple binary searching
+    data[1] = 71;
+    data[2] = 95;
 
     for (i = 0; i<=NR; i+=4) {
         code = data[i];
