@@ -1,22 +1,44 @@
 #!/usr/bin/awk -f
 BEGIN{
 }
+
+function lengthOfRunOfDigits(str, idx) {
+    count = 0
+    currentValue = int(substr(str, idx+1, 1));
+    for (k = idx; k < length(str); k++) {
+        valueAtIndex = int(substr(str, k+1, 1));
+        if (valueAtIndex == currentValue) {
+            count++;
+        }
+        else {
+            break;
+        }
+    }
+    return count
+}
+
 # returns whether a password is valid
 # "n" means no, "y" means yes
 function isPasswordValid(password) {
     passwordLength=length(password);
-    lastSeenDigit = 100
-    hasRepeatedDigits = 0
+    lastSeenDigit = 0
+    hasTwoRepeatedDigits = 0
     hasDescendedDigits = 0
     for (i = 0; i < passwordLength; i++) {
         digitAtIndex = int(substr(password, i+1, 1));
-        if (i != 0) {
-            if (digitAtIndex == lastSeenDigit) { hasRepeatedDigits = 1; }
-            if (digitAtIndex < lastSeenDigit) { hasDescendedDigits = 1; }
+        digitRunLength = lengthOfRunOfDigits(password, i);
+        if (digitRunLength == 2) {
+            hasTwoRepeatedDigits = 1;
+        }
+        if (digitRunLength > 1) {
+            i += digitRunLength-1
+        }
+        if (digitAtIndex < lastSeenDigit) {
+            hasDescendedDigits = 1;
         }
         lastSeenDigit = digitAtIndex;
     }
-    if (hasRepeatedDigits == 1 && hasDescendedDigits == 0) {
+    if (hasTwoRepeatedDigits == 1 && hasDescendedDigits == 0) {
         return "y";
     }
     return "n";
